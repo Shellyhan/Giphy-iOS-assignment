@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16G29" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CoreDataGif" representedClassName="CoreDataGif" syncable="YES">
+        <attribute name="storedGifId" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="StoredGif" representedClassName="StoredGif" syncable="YES" codeGenerationType="class">
+        <attribute name="storedGifId" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="CoreDataGif" positionX="-63" positionY="-18" width="128" height="60"/>
+        <element name="StoredGif" positionX="-63" positionY="-9" width="128" height="60"/>
+    </elements>
+</model>
