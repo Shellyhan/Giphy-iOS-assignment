@@ -1,8 +1,8 @@
 //
 //  GIFTableViewCell.swift
-//  GIFApp
+//  iOSAssignment
 //
-//  Created by Shelly Han on 2017-11-16.
+//  Created by Shelly Han on 2017-11-18.
 //  Copyright © 2017 ShellyHan. All rights reserved.
 //
 
@@ -20,12 +20,10 @@ final class GIFTableViewCell: UITableViewCell {
     var viewModel : GifProtocol? {
         didSet {
             gifImageView.kf.setImage(with: viewModel?.gifURL)
-            if (viewModel?.matchGif(gifIDInput: "\(self.viewModel!.gifID)"))! {
+            if (viewModel?.matchGif(gifIDInput: "\(self.viewModel!.gifURL)"))! {
                 likeButton.isSelected = true
-//                likeButtonImageView.image = UIImage(named: "01")
             } else {
                 likeButton.isSelected = false
-//                likeButtonImageView.image = UIImage(named: "00")
             }
         }
     }
@@ -38,22 +36,18 @@ final class GIFTableViewCell: UITableViewCell {
     }()
     
     let likeButton = UIButton()
-    let likeButtonImageView = UIImageView()
     
     //MARK: - View lifecycle
     override func awakeFromNib() {
         super.awakeFromNib()
         
-//        self.isUserInteractionEnabled = false
-//        self.selectionStyle = UITableViewCellSelectionStyle.none
-        
         gifImageView.kf.indicatorType = .activity
         contentView.addSubview(gifImageView)
+        
     
         likeButton.setImage(UIImage(named: "01"), for: UIControlState.selected)
         likeButton.setImage(UIImage(named: "00"), for: UIControlState.normal)
         contentView.addSubview(likeButton)
-//        likeButton.addSubview(likeButtonImageView)
 
          gifImageView.snp.makeConstraints { (make) -> Void in
             make.height.equalTo(150)
@@ -62,15 +56,9 @@ final class GIFTableViewCell: UITableViewCell {
          }
         likeButton.snp.makeConstraints { (make) -> Void in
             make.height.width.equalTo(30)
-            make.left.equalTo(self.contentView)
+            make.right.equalTo(self.contentView)
             make.centerY.equalTo(self.contentView)
         }
-//        likeButton.snp.makeConstraints { (make) -> Void in
-//            make.height.equalTo(self.contentView)
-//            make.width.equalTo(self.contentView)
-//            make.left.equalTo(self.contentView)
-//            make.top.equalTo(self.contentView)
-//        }
 
     }
     
@@ -78,12 +66,10 @@ final class GIFTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: false)
 
         // Configure the view for the selected state
-//        do nothing???
     }
     
     override func prepareForReuse() {
-        
-        // does nothing, but recommended to call anyway..
+//        Dispose the cell everytime, to avoide duplicated obervable events
         super.prepareForReuse()
         disposeBag = DisposeBag()
     }

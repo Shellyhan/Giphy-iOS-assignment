@@ -1,8 +1,8 @@
 //
-//  GIFTableViewController.swift
-//  GIFApp
+//  GifViewModel.swift
+//  iOSAssignment
 //
-//  Created by Shelly Han on 2017-11-16.
+//  Created by Shelly Han on 2017-11-18.
 //  Copyright © 2017 ShellyHan. All rights reserved.
 //
 
@@ -15,8 +15,6 @@ protocol GifProtocol {
     
     // ########################## MARK: Outputs ##########################
     var gifURL : URL { get }
-    var gifID : String { get }
-    var gifIsLiked : Bool { get set }
     
     //for the core data operation
     func getStoredGifs() -> Variable<[CoreDataGif]>
@@ -26,7 +24,6 @@ protocol GifProtocol {
 }
 
 final class GifViewModel : GifProtocol {
-    var gifIsLiked: Bool
 
     //MARK: - Private properties
     private var gif: Gif!
@@ -36,20 +33,14 @@ final class GifViewModel : GifProtocol {
     var disposeBag = DisposeBag()
     
     
-
     //MARK: - Public properties
     var gifURL : URL {
         return gif.gifUrl
-    }
-    
-    var gifID: String {
-        return gif.id
     }
 
     //MARK: - Initialization
     init(gif: Gif) {
         self.gif = gif
-        gifIsLiked = gif.isLiked
         fetchStoredGifsAndUpdateObservableGifs()
     }
 

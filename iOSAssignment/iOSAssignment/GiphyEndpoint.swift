@@ -55,9 +55,6 @@ extension GiphyEndpoint: TargetType {
             GiphyConstants.Parameters.offset : offset
          ]
       }
-      
-      print(parameters)
-            
       return parameters
    }
    

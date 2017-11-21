@@ -1,8 +1,8 @@
 //
 //  GIFTableViewController.swift
-//  GIFApp
+//  iOSAssignment
 //
-//  Created by Shelly Han on 2017-11-16.
+//  Created by Shelly Han on 2017-11-18.
 //  Copyright © 2017 ShellyHan. All rights reserved.
 //
 
@@ -16,7 +16,9 @@ import NSObject_Rx
 final class GIFTableViewController: UIViewController, UITableViewDelegate {
 
     //MARK: - Public properties
-    var viewModel = GifCollectionViewModel(provider: RxMoyaProvider<GiphyEndpoint>())
+    var viewModel = GifTableViewModel(provider: RxMoyaProvider<GiphyEndpoint>())
+    
+    var okToScroll = false
     
     
     //MARK: - Private properties
@@ -28,10 +30,20 @@ final class GIFTableViewController: UIViewController, UITableViewDelegate {
     @IBOutlet weak var gifTableView: UITableView!
     
     
+// to trigger the table view reload after core data changed:
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        if okToScroll {
+            let newIndexPath = IndexPath(row: 6, section: 0)
+            self.gifTableView.scrollToRow(at: newIndexPath, at: .none, animated: false)
+        }
+    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+    
         gifTableView.allowsSelection = false
         // Sets self as tableview delegate
         gifTableView
@@ -39,12 +51,9 @@ final class GIFTableViewController: UIViewController, UITableViewDelegate {
             .addDisposableTo(disposeBag)
         
         setupBindings()
+
     }
 }
-
-
-
-
 
 
 
@@ -62,7 +71,6 @@ private extension GIFTableViewController {
             .debounce(0.5, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
         
-//        pagination:********************************************************************************************************
         let pageTrigger = gifTableView.rx
             .contentOffset
             .filter {
@@ -79,25 +87,20 @@ private extension GIFTableViewController {
             .flatMap { _ in return Observable.just() }
         
         viewModel.setUpObservables(pageTrigger: pageTrigger, searchString: searchString)
-        // Bind collection view to GIF results now that view model is set up
-        setupCollectionView()
+        // Bind tableview to GIF results now that view model is set up
+        setupTableView()
     }
     
-    //xxxxx rename!!!!
-    func setupCollectionView() {
-        
-        // bind our GIF set to individual collection cells
-//        viewModel.gifs
-//            .bindTo(gifTableView.rx.items(cellIdentifier: "Tcell", cellType: GIFTableViewCell.self)) {
-//                (row, element, cell) in
-//                cell.viewModel = element
-//            }
-//            .addDisposableTo(disposeBag)
 
+    func setupTableView() {
+        
+        // bind our GIF set to individual tableview cells
         viewModel.gifs
             .bindTo(gifTableView.rx.items) {
                 
                 (tableView, row, element) in
+                
+                
                 let indexPath = IndexPath(row: row, section: 0)
                     // or some other logic to determine which cell type to create
                     
@@ -108,22 +111,21 @@ private extension GIFTableViewController {
                 //setup the buttons:
                 cell.likeButton.rx.tap
                     .subscribe(onNext: {
-                        let currentGifIDString = "\(element.gifID)"
+                        let currentGifIDString = "\(element.gifURL)"
                         
-                        print("click")
-                        print(currentGifIDString)
+//                        print("------click-------")
+//                        print(currentGifIDString)
+//                        print("-----------------")
                         
                         if (element.matchGif(gifIDInput: currentGifIDString)) {
-                            // git is liked already, remove it:
+                            // gif is liked already, remove it:
                             element.removeExistingGif(withCoreDataGif: currentGifIDString)
                             cell.likeButton.isSelected = false
-//                            cell.likeButtonImageView.image = UIImage(named: "00")
                             
                         } else {
                             // like gif and store it:
                             element.addNewGif(withCoreDataGif: currentGifIDString)
                             cell.likeButton.isSelected = true
-//                            cell.likeButtonImageView.image = UIImage(named: "01")
                         }
                     })
                     .addDisposableTo(cell.disposeBag)
@@ -138,9 +140,13 @@ private extension GIFTableViewController {
         
         // bind our GIF set being empty to displaying the default view
         viewModel.gifs
-            .map { gifs in gifs.count != 0 }
+            .map { gifs in
+                self.okToScroll = true
+                return gifs.count != 0
+            }
             .bindTo(defaultView.rx.isHidden)
             .addDisposableTo(disposeBag)
+     
     }
     
     
@@ -151,8 +157,6 @@ private extension GIFTableViewController {
                 if self.gifSearchBar.isFirstResponder == true {
                     self.view.endEditing(true)
                 }
-                
-                self.gifTableView.cellForRow(at: indexPath)?.backgroundColor = UIColor.blue
             })
             .addDisposableTo(disposeBag)
         

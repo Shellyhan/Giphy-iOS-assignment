@@ -1,9 +1,9 @@
 //
 //  GifTableViewModel.swift
-//  GIFApp
+//  iOSAssignment
 //
-//  Created by Alex Vickers on 1/31/17.
-//  Copyright © 2017 skciva. All rights reserved.
+//  Created by Shelly Han on 2017-11-18.
+//  Copyright © 2017 ShellyHan. All rights reserved.
 //
 
 import Foundation
@@ -11,10 +11,8 @@ import RxSwift
 import Moya
 import Moya_ObjectMapper
 
-protocol GifCollectionViewModelProtocol {
-   
-   // ########################## MARK: Inputs ##########################
-   
+protocol GifTableViewModelProtocol {
+      
    /// Sets up observables for the object
    /// - Parameters:
    ///   - pageTrigger: Signals the user has scrolled to the bottom
@@ -26,15 +24,12 @@ protocol GifCollectionViewModelProtocol {
    ///   trending or searched GIFs.
    var gifs : Observable<[GifProtocol]>! { get set }
     
-    
 }
 
-
-
-final class GifCollectionViewModel : GifCollectionViewModelProtocol {
+final class GifTableViewModel : GifTableViewModelProtocol {
    // MARK: Public properties
    var gifs : Observable<[GifProtocol]>!
-   
+
    // MARK: - Private properties
    fileprivate var networkModel : GiphyNetworkModelProtocol
    
@@ -42,10 +37,6 @@ final class GifCollectionViewModel : GifCollectionViewModelProtocol {
    init(provider: RxMoyaProvider<GiphyEndpoint>) {
       networkModel = GiphyNetworkModel(provider: provider)
    }
-   
-    
-    
-    
     
    func setUpObservables(pageTrigger: Observable<Void>, searchString: Observable<String>) {
       let isSearching = searchString.map { $0.characters.count > 0 }
@@ -56,19 +47,13 @@ final class GifCollectionViewModel : GifCollectionViewModelProtocol {
       
       setupGifs(isSearching: isSearching, searchText: searchString)
    }
-    
-    
 }
 
-
-
-
-
 // MARK: - Setup
-private extension GifCollectionViewModel {
+private extension GifTableViewModel {
+    
    
 //    func setupLikes
-    
    func setupGifs(isSearching: Observable<Bool>, searchText: Observable<String>) {
       let trendingGifs = networkModel.recursivelyLoadGifs([], token: .trending(offset: 0))
       
@@ -84,6 +69,7 @@ private extension GifCollectionViewModel {
       
       gifs = Observable.combineLatest(trendingGifs, searchGifs, isSearching.asObservable()) {
          (trending, searched, isSearching) -> [Gif] in
+        
          return isSearching ? searched : trending
          }
          .map { $0.map(GifViewModel.init) }
